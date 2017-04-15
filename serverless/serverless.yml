@@ -56,17 +56,16 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http: GET hello
   analyze:
     handler: handler.analyze
     environment:
       TONE_ANALYZER_USERNAME: ${env:TONE_ANALYZER_USERNAME}
       TONE_ANALYZER_PASSWORD: ${env:TONE_ANALYZER_PASSWORD}
     events:
-      - http: POST analyze
+      - http:
+          path: analyze
+          method: post
+          cors: true
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

@@ -20,6 +20,7 @@
         "*://www.facebook.com/*"
       ],
       "js": [
+        "src/globals.js",
         "src/inject.js"
       ]
     }
