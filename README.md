@@ -1,9 +1,5 @@
 # CheckYourSentiment
 
-## How to run
+The `serverless` service (deployed on AWS) is in the `serverless` folder.
 
-1. `npm install -g serverless`
-
-2. `npm install`
-
-3. `serverless deploy`
+The Chrome extension is in the `extension` folder.
