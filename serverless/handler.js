@@ -1,12 +1,7 @@
 'use strict'
 
-const watson = require('watson-developer-cloud')
-const toneAnalyzer = watson.tone_analyzer({
-  username: process.env.TONE_ANALYZER_USERNAME,
-  password: process.env.TONE_ANALYZER_PASSWORD,
-  version: 'v3',
-  version_date: '2016-05-19'
-})
+const twitter = require('./twitter')
+const toneAnalyzer = require('./toneAnalyzer')
 
 function getResponse (statusCode, body) {
   return {
@@ -21,8 +16,6 @@ function getResponse (statusCode, body) {
 }
 
 module.exports.analyze = (event, context, callback) => {
-  const response = {}
-
   let body
   try {
     body = JSON.parse(event.body)
@@ -36,11 +29,29 @@ module.exports.analyze = (event, context, callback) => {
     return
   }
 
-  toneAnalyzer.tone({ text: body.text }, (err, tone) => {
-    if (err) {
+  toneAnalyzer.analyze(body.text)
+    .then(tone => {
+      callback(null, getResponse(200, tone))
+    })
+    .catch(err => {
       callback(null, getResponse(500, { message: err.message }))
-      return
-    }
-    callback(null, getResponse(200, tone))
-  })
+    })
+}
+
+module.exports.report = (event, context, callback) => {
+  const username = event.queryStringParameters ? event.queryStringParameters.username : null
+  if (typeof username !== 'string' || username.length === 0) {
+    callback(null, getResponse(400, { message: 'The "username" parameter is required.' }))
+    return
+  }
+
+  const tweetsPromise = twitter.getTweets(username)
+  const tonesPromise = tweetsPromise.then(tweets => Promise.all(tweets.map(tweet => toneAnalyzer.analyze(tweet.text))))
+  Promise.all([tweetsPromise, tonesPromise])
+    .then(([tweets, tones]) => {
+      callback(null, getResponse(200, { tweets, tones }))
+    })
+    .catch(err => {
+      callback(null, getResponse(500, { message: err.message }))
+    })
 }

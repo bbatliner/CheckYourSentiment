@@ -21,6 +21,13 @@ provider:
   name: aws
   runtime: nodejs6.10
   profile: hackunl
+  environment:
+      TONE_ANALYZER_USERNAME: ${env:TONE_ANALYZER_USERNAME}
+      TONE_ANALYZER_PASSWORD: ${env:TONE_ANALYZER_PASSWORD}
+      TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
+      TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
+      TWITTER_ACCESS_TOKEN_KEY: ${env:TWITTER_ACCESS_TOKEN_KEY}
+      TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
 
 # you can overwrite defaults here
 #  stage: dev
@@ -58,13 +65,17 @@ provider:
 functions:
   analyze:
     handler: handler.analyze
-    environment:
-      TONE_ANALYZER_USERNAME: ${env:TONE_ANALYZER_USERNAME}
-      TONE_ANALYZER_PASSWORD: ${env:TONE_ANALYZER_PASSWORD}
     events:
       - http:
           path: analyze
           method: post
+          cors: true
+  report:
+    handler: handler.report
+    events:
+      - http:
+          path: report
+          method: get
           cors: true
 
 #    The following are a few example events you can configure
