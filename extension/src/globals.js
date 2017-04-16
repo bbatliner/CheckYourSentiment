@@ -64,3 +64,14 @@ function stringToDom (html) {
     }
     return element;
 }
+
+// https://gomakethings.com/climbing-up-and-down-the-dom-tree-with-vanilla-javascript/
+function getClosest (selector, elem) {
+    // Get closest match
+    for (; elem && elem !== document; elem = elem.parentNode) {
+        if (elem.matches(selector)) {
+            return elem
+        }
+    }
+    return null
+}

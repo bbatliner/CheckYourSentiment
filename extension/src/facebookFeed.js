@@ -20,13 +20,22 @@ function getToneData (text) {
 function fbUserContentProcessor (el) {
   let isColorful = false
   function setBackgroundColor (r, g, b, a) {
+    if (a === 0) {
+      return
+    }
     if (isColorful) {
       el.querySelector('.userContent').firstChild.style.backgroundColor = `rgba(${r},${g},${b},${a})`
     } else {
       const userContent = Array.from(el.querySelectorAll('.userContent')).filter(el => el.textContent.length > 0)[0]
       userContent.style.backgroundColor = `rgba(${r},${g},${b},${a})`
       userContent.style.padding = '5px'
+      userContent.style.borderRadius = '3px'
+      userContent.style.marginLeft = '-5px'
+      userContent.style.marginRight = '-5px'
     }
+    const upper = getClosest('.fbUserContent', el)
+    const lower = el.querySelector('.fbUserContent')
+    ;(upper || lower).style.border = `1px solid rgba(${r},${g},${b},${2*a})`
   }
   let userContent = Array.from(el.querySelectorAll('.userContent p')).map(p => p.textContent).join('')
   if (!userContent.length) {
@@ -45,21 +54,26 @@ function fbUserContentProcessor (el) {
       emotionTones.sort((a, b) => {
         return b.score - a.score
       })
+      const THRESHOLD = 0.5
+      if (emotionTones[0].score < THRESHOLD) {
+        return
+      }
+      emotionTones[0].score = (1 / THRESHOLD) * (emotionTones[0].score - THRESHOLD)
       switch (emotionTones[0].tone_name) {
         case 'Anger':
-          setBackgroundColor(255, 0, 0, emotionTones[0].score)
+          setBackgroundColor(217, 8, 0, emotionTones[0].score)
           break
         case 'Disgust':
-          setBackgroundColor(0, 255, 0, emotionTones[0].score)
+          setBackgroundColor(214, 89, 232, emotionTones[0].score)
           break
         case 'Fear':
-          setBackgroundColor(27, 4, 39, emotionTones[0].score)
+          setBackgroundColor(48, 220, 61, emotionTones[0].score)
           break
         case 'Sadness':
-          setBackgroundColor(0, 0, 255, emotionTones[0].score)
+          setBackgroundColor(0, 67, 255, emotionTones[0].score)
           break
         case 'Joy':
-          setBackgroundColor(0, 188, 212, emotionTones[0].score)
+          setBackgroundColor(255, 249, 0, emotionTones[0].score)
           break
         default:
           console.error('Did not set colors:', emotionTones[0].tone_name)
