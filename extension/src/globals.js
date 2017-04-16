@@ -75,3 +75,21 @@ function getClosest (selector, elem) {
     }
     return null
 }
+
+function getNearest (selector, elem) {
+    return elem.querySelector(selector) || getClosest(selector, elem)
+}
+
+function getFarthest (selector, elem) {
+    let farthest
+    for (; elem && elem !== document; elem = elem.parentNode) {
+        if (elem.matches(selector)) {
+            farthest = elem
+        }
+    }
+    return farthest
+}
+
+function getFurthest (selector, elem) {
+    return elem.querySelector(selector) || getFarthest(selector, elem)
+}
