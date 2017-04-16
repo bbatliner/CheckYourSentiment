@@ -16,12 +16,14 @@
   ],
   "content_scripts": [
     {
+      "run_at": "document_idle",
       "matches": [
         "*://www.facebook.com/*"
       ],
       "js": [
         "src/globals.js",
-        "src/inject.js"
+        "src/facebookPost.js",
+        "src/facebookFeed.js"
       ]
     }
   ]
