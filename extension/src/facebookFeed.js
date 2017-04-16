@@ -53,7 +53,7 @@ function fbUserContentProcessor (el) {
   getToneData(userContent)
     .then(data => {
       console.log(userContent)
-      const parentContainer = getNearest('[id^="hyperfeed_story"]', el)
+      const parentContainer = getNearest('[id^="hyperfeed_story"]', el) || getNearest('.fbUserContent', el)
       if (parentContainer.querySelector('.PageLikeButton')) {
         return
       }
@@ -113,27 +113,33 @@ function fbUserContentProcessor (el) {
 
 }
 
-function onload () {
-  Array.from(document.querySelectorAll('.fbUserContent')).forEach(el => {
-    fbUserContentProcessor(el)
-  })
-}
-if (document.readyState === 'complete') {
-  onload()
-} else {
-  window.addEventListener('load', onload)
-}
+function main () {
+  function onload () {
+    Array.from(document.querySelectorAll('.fbUserContent')).forEach(el => {
+      fbUserContentProcessor(el)
+    })
+  }
+  if (document.readyState === 'complete') {
+    onload()
+  } else {
+    window.addEventListener('load', onload)
+  }
 
-const observer = new MutationObserver(mutations => {
-  mutations.forEach(mutation => {
-    mutation.addedNodes.forEach(node => {
-      if (node.classList && node.classList.contains('fbUserContent') || node.querySelector && node.querySelector('.fbUserContent')) {
-        fbUserContentProcessor(node)
-      }
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (node.classList && node.classList.contains('fbUserContent') || node.querySelector && node.querySelector('.fbUserContent')) {
+          fbUserContentProcessor(node)
+        }
+      })
     })
   })
-})
-observer.observe(document.querySelector('[id^="feed_stream"]'), {
-  childList: true,
-  subtree: true
-})
+  observer.observe(document.querySelector('[id^="feed_stream"]') || document.querySelector('#contentArea'), {
+    childList: true,
+    subtree: true
+  })
+}
+
+// TODO: this is a bad idea lol
+onUrlChange(() => setTimeout(main, 1500))
+main()
